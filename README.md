@@ -27,6 +27,7 @@ The project is a single-page web application with the following core files:
 *   `styles.css`: Provides the CSS rules for the visual appearance and layout of the application.
 *   `ai_handler.js`: This file manages all interactions with Large Language Models (LLMs) for generating creative suggestions (e.g., character names, bio lines). It handles API calls (defaulting to OpenAI, but supporting custom API providers via the 'Start' screen settings) and includes functionality to validate the provided API key.
 *   `characterlab.png`: The logo image used in the application's header and as the website's favicon.
+*   `proxy.php`: A server-side PHP script that relays API requests from the client-side JavaScript (`ai_handler.js`) to the target LLM API provider. This helps in managing API interactions and can mitigate potential CORS (Cross-Origin Resource Sharing) issues when the application is hosted live. It expects the target API URL and the request payload from the client and forwards them along with the client's Authorization header.
 
 ## Key Features
 
