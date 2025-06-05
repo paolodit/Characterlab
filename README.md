@@ -25,7 +25,7 @@ The project is a single-page web application with the following core files:
     *   Generating suggestions for character attributes (e.g., bio, system prompt) via API calls.
     *   Exporting the final character data as a JSON file (`.json`).
 *   `styles.css`: Provides the CSS rules for the visual appearance and layout of the application.
-*   `gpt.js`: This file manages all interactions with Large Language Models (LLMs) for generating creative suggestions (e.g., character names, bio lines). It handles API calls (defaulting to OpenAI, but supporting custom API providers via the 'Start' screen settings) and includes functionality to validate the provided API key.
+*   `ai_handler.js`: This file manages all interactions with Large Language Models (LLMs) for generating creative suggestions (e.g., character names, bio lines). It handles API calls (defaulting to OpenAI, but supporting custom API providers via the 'Start' screen settings) and includes functionality to validate the provided API key.
 *   `characterlab.png`: The logo image used in the application's header and as the website's favicon.
 
 ## Key Features
