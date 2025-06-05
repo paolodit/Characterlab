@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CharacterLab – ElizaOS Character Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="characterlab.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+  <header>
+    <img src="characterlab.png" alt="CharacterLab Logo" id="header-logo">
+    <div class="header-text-content">
+      <h1>CharacterLab</h1>
+      <p class="subheading">ElizaOS Character Generator</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <h1>CharacterLab</h1>
+      <div class="steps">
+        <div class="step" data-step="start"><i class="fas fa-cog"></i> Start</div>
+        <div class="step" data-step="name">Name</div>
+        <div class="step" data-step="clients">Clients</div>
+        <div class="step" data-step="systemPrompt">System Prompt</div>
+        <div class="step" data-step="bio">Bio</div>
+        <div class="step" data-step="lore">Lore</div>
+        <div class="step" data-step="adjectives">Adjectives</div>
+        <div class="step" data-step="knowledge">Knowledge</div>
+        <div class="step" data-step="topics">Topics</div>
+        <div class="step" data-step="messageExamples">Examples</div>
+        <div class="step" data-step="style">Style</div>
+        <div class="step" data-step="chat">Chat</div>
+        <div class="step" data-step="post">Post</div>
+        <div class="step" data-step="settings">Advanced</div>
+      </div>      
+    </aside>
+
+    <main class="main">
+      <div class="editor">
+        <!-- 1) Start: Merged Welcome & API Key/Model -->
+        <section id="screen-start" class="screen">
+          <h2>Welcome to CharacterLab</h2>
+          <p>Your creative AI sidekick for building ElizaOS character files.</p>
+          <div class="info-carousel">
+            <div class="info-item">
+              <p><i class="fas fa-key"></i> You will need to enter an AI API key to unlock character generation suggestions.
+                 Get a (cost) <a href="https://platform.openai.com/docs/overview" target="_blank">OpenAI API Key</a>.
+                 <br/>Or a free <a href="https://www.groq.ai" target="_blank">Groq AI API Key</a>.</p>
+            </div>
+            <div class="info-item">
+              <p><i class="fas fa-cogs"></i> Optional sections let you fine-tune details like style, chat, and message examples. You can save your character to the "Cast" at any time using the button in the Preview Pane.</p>
+            </div>
+            <div class="info-item">
+              <p><i class="fas fa-database"></i> Data Storage: All character data and settings are stored locally in your browser. 
+                  Characters typically are accessible even after browser restarts.
+                 Nothing is sent to external servers except API calls for generating suggestions.</p>
+            </div>
+            <div class="info-item">
+              <p><i class="fas fa-shield-alt"></i> Privacy Note: If you share this computer with others, please be aware that your
+                 API key will be stored in the browser's local storage and could be visible to other users.</p>
+            </div>
+            <div class="info-navigation">
+              <button id="prevInfoBtn" class="info-nav-btn">&lt;</button>
+              <span id="infoProgress">1/4</span>
+              <button id="nextInfoBtn" class="info-nav-btn">&gt;</button>
+            </div>
+          </div>
+          <div class="api-section">
+            <h3>Enter API Key &amp; Select AI Model</h3>
+            <input type="text" id="apiKey" placeholder="Enter API Key" title="Your API key">
+            
+            <div id="apiProviderContainer" style="margin-top: 10px;">
+              <label for="apiProvider">API Provider:</label>
+              <select id="apiProvider" onchange="updateModelOptions()">
+                <option value="https://api.openai.com/v1/chat/completions">OpenAI</option>
+                <option value="https://api.groq.com/openai/v1/chat/completions">Groq</option>
+                <option value="other">Other...</option>
+              </select>
+              <div id="apiProviderOther" style="display: none; margin-top: 10px;">
+                <input type="text" id="apiProviderInput" placeholder="Enter API Provider URL" style="width: 100%;">
+              </div>
+            </div>
+            
+            <div id="modelContainer" style="margin-top: 10px;">
+              <label for="aiModel">Model:</label>
+              <div id="openaiModels">
+                <select id="aiModel">
+                  <option value="gpt-4-turbo-2024-04-09" selected>gpt-4-turbo-2024-04-09</option>
+                  <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                  <option value="gpt-4">gpt-4</option>
+                  <option value="gpt-4o">gpt-4o</option>
+                </select>
+              </div>
+              <div id="groqModels" style="display: none;">
+                <select id="groqModel">
+                  <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                  <option value="qwen-2.5-32b">qwen-2.5-32b</option>
+                </select>
+              </div>
+              <div id="customModel" style="display: none;">
+                <input type="text" id="customModelInput" placeholder="Enter model name" style="width: 100%;">
+              </div>
+            </div>
+            
+            <div style="margin-top: 15px;">
+              <button type="button" class="btn-next" id="nextButtonStartScreen" onclick="saveStep('start')">Next &rarr;</button>
+              <p id="apiTestStatus" class="message error-message" style="margin-top: 10px;"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2) Name -->
+        <section id="screen-name" class="screen">
+          <h2>Name</h2>
+          <p>
+            Enter a unique name
+            <span class="tooltip" title="A name that uniquely identifies your character. Press &#x21bb; to refresh suggestions.">?</span>
+          </p>
+          <input type="text" id="characterName" placeholder="Character Name" oninput="characterData.name = this.value; updatePreview(); autoSave();" title="Enter your character's name">
+          <div>
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateNameSuggestions()">&#x21bb;</button>
+          </div>
+          <div class="suggestions" id="nameSuggestions"></div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('name')">Next</button>
+          </div>
+        </section>
+
+        <!-- 3) Supported Clients -->
+        <section id="screen-clients" class="screen">
+          <h2>Supported Clients</h2>
+          <p>Select which platforms this character supports.</p>
+          <div class="checkbox-group">
+            <label><input type="checkbox" value="twitter" onclick="toggleClient(this)"> Twitter</label>
+            <label><input type="checkbox" value="discord" onclick="toggleClient(this)"> Discord</label>
+            <label><input type="checkbox" value="telegram" onclick="toggleClient(this)"> Telegram</label>
+            <label><input type="checkbox" value="slack" onclick="toggleClient(this)"> Slack</label>
+            <label><input type="checkbox" value="farcaster" onclick="toggleClient(this)"> Farcaster</label>
+            <label><input type="checkbox" value="lens" onclick="toggleClient(this)"> Lens</label>
+            <label><input type="checkbox" value="direct" onclick="toggleClient(this)"> Direct</label>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('clients')">Next</button>
+          </div>
+        </section>
+
+        <!-- NEW: System Prompt -->
+        <section id="screen-systemPrompt" class="screen" data-step="systemPrompt">
+          <h2>System Prompt (Optional)</h2>
+          <p>
+            Define the character's core role or primary function for the AI. This helps guide the AI's behavior and responses. Only one prompt should be active.
+            <span class="tooltip" title="A single sentence that tells the AI what role this character plays. e.g., 'You are a helpful assistant.' Suggestions are provided below, or write your own.">?</span>
+          </p>
+          <textarea id="systemPromptInput" placeholder="Enter system prompt here, e.g., You are a witty pirate captain sharing tales of the high seas." oninput="characterData.systemPrompt = this.value; updatePreview(); autoSave();" title="Enter the system prompt for your character" style="width: 100%; min-height: 60px;"></textarea>
+          
+          <div>
+            <span style="font-weight:bold;">Suggestions:</span>
+            <!-- Suggestions will be populated here by JavaScript -->
+          </div>
+          <div class="suggestions" id="systemPromptSuggestions" style="margin-top:10px;">
+            <!-- Example: <button class="btn-suggestion">Suggestion text</button> -->
+          </div>
+
+          <div style="margin-top: 15px;">
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('systemPrompt')">Next</button>
+          </div>
+        </section>
+
+        <!-- 4) Bio -->
+        <section id="screen-bio" class="screen">
+          <h2>Bio</h2>
+          <p>
+            Enter a short “Bio Seed” (a brief summary to inspire suggestions; it won't be added as a Bio Line). Then, add your detailed Bio Lines below.
+          </p>
+          <div style="display:flex; align-items:center;">
+            <input type="text" id="bioSeed" placeholder="e.g., A grumpy gnome, from a poor family, who loves to bake cheesecakes" oninput="characterData.bioSeed = this.value; updatePreview(); autoSave();" title="Enter a brief bio seed">
+            <button class="btn-respin" onclick="populateBioSuggestions(); autoSave()">Generate Bio Suggestions</button>
+          </div>
+          <hr>
+          <h3>Bio Lines (Optional)</h3>
+          <input type="text" id="bioLine" placeholder="Enter a bio line" title="Enter a bio line">
+          <button class="btn-add" onclick="addLine('bio'); autoSave()">Add Line</button>
+          <div id="bioLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateBioSuggestions(); autoSave()">↻</button>
+            <div id="bioSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('bio')">Next</button>
+          </div>
+        </section>
+
+        <!-- 5) Lore -->
+        <section id="screen-lore" class="screen">
+          <h2>Lore</h2>
+          <p>Backstory elements and unique character traits. (Optional)</p>
+          <input type="text" id="loreLine" placeholder="Enter a lore sentence" title="Enter a lore line">
+          <button class="btn-add" onclick="addLine('lore'); autoSave()">Add Line</button>
+          <div id="loreLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateLoreSuggestions(); autoSave()">↻</button>
+            <div id="loreSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('lore')">Next</button>
+          </div>
+        </section>
+
+        <!-- 6) Adjectives -->
+        <section id="screen-adjectives" class="screen">
+          <h2>Adjectives</h2>
+          <p>Words or short phrases describing the character's personality or style. (Optional)</p>
+          <input type="text" id="adjectivesLine" placeholder="Enter an adjective or short phrase" title="Enter an adjective">
+          <button class="btn-add" onclick="addLine('adjectives'); autoSave()">Add Line</button>
+          <div id="adjectivesLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateAdjectivesSuggestions(); autoSave()">↻</button>
+            <div id="adjectivesSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('adjectives')">Next</button>
+          </div>
+        </section>
+
+        <!-- 7) Knowledge -->
+        <section id="screen-knowledge" class="screen">
+          <h2>Knowledge</h2>
+          <p>Facts or references to ground the character's responses. (Optional)</p>
+          <input type="text" id="knowledgeLine" placeholder="Enter a knowledge fact" title="Enter a fact or reference">
+          <button class="btn-add" onclick="addLine('knowledge'); autoSave()">Add Line</button>
+          <div id="knowledgeLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateKnowledgeSuggestions(); autoSave()">↻</button>
+            <div id="knowledgeSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('knowledge')">Next</button>
+          </div>
+        </section>
+
+        <!-- 8) Topics -->
+        <section id="screen-topics" class="screen">
+          <h2>Topics</h2>
+          <p>Areas of interest or expertise that the character can speak about. (Optional)</p>
+          <input type="text" id="topicsLine" placeholder="Enter a topic" title="Enter a topic">
+          <button class="btn-add" onclick="addLine('topics'); autoSave()">Add Line</button>
+          <div id="topicsLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateTopicsSuggestions(); autoSave()">↻</button>
+            <div id="topicsSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('topics')">Next</button>
+          </div>
+        </section>
+
+        <!-- 9) Message Examples -->
+        <section id="screen-messageExamples" class="screen">
+          <h2>Message Examples</h2>
+          <p>Provide example interactions (user prompt &amp; character response). (Optional)</p>
+          <div class="message-example-inputs">
+            <label for="messageExampleUser">User Says:</label>
+            <textarea id="messageExampleUser" rows="2" placeholder="User's prompt or question"></textarea>
+            <label for="messageExampleCharacter">Character Responds:</label>
+            <textarea id="messageExampleCharacter" rows="3" placeholder="Character's response"></textarea>
+          </div>
+          <button class="btn-add" onclick="addMessageExample(); autoSave()">Add Example</button>
+          <div id="messageExamplesContainer"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateMessageExamplesSuggestions(); autoSave()">↻</button>
+            <div id="messageExamplesSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('messageExamples')">Next</button>
+          </div>
+        </section>
+
+        <!-- 10) General Style -->
+        <section id="screen-style" class="screen">
+          <h2>General Style</h2>
+          <p>Describe how the character communicates in general. Include speech patterns, mannerisms, and typical expressions. Add one style point at a time. (Optional)</p>
+          <input type="text" id="generalStyleLine" placeholder="E.g., Speaks in short, clipped sentences" title="Enter a style point">
+          <button class="btn-add" onclick="addLine('generalStyle'); autoSave()">Add Line</button>
+          <div id="generalStyleLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateGeneralStyleSuggestions(); autoSave()">↻</button>
+            <div id="generalStyleSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('style')">Next</button>
+          </div>
+        </section>
+
+        <!-- 11) Chat Style -->
+        <section id="screen-chat" class="screen">
+          <h2>Chat Style</h2>
+          <p>Describe how the character behaves in conversations. Include response patterns and chat-specific mannerisms. Add one style point at a time. (Optional)</p>
+          <input type="text" id="chatStyleLine" placeholder="E.g., Prefers direct messages over group chats" title="Enter a chat style point">
+          <button class="btn-add" onclick="addLine('chatStyle'); autoSave()">Add Line</button>
+          <div id="chatStyleLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populateChatStyleSuggestions(); autoSave()">↻</button>
+            <div id="chatStyleSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('chat')">Next</button>
+          </div>
+        </section>
+
+        <!-- 12) Post Style -->
+        <section id="screen-post" class="screen">
+          <h2>Post Style</h2>
+          <p>Describe how the character writes posts or longer content. Include formatting preferences and writing style. Add one style point at a time. (Optional)</p>
+          <input type="text" id="postStyleLine" placeholder="E.g., Writes long, thoughtful posts" title="Enter a post style point">
+          <button class="btn-add" onclick="addLine('postStyle'); autoSave()">Add Line</button>
+          <div id="postStyleLines"></div>
+          <div class="suggestions">
+            <span style="font-weight:bold;">Suggestions:</span>
+            <button class="btn-respin" onclick="populatePostStyleSuggestions(); autoSave()">↻</button>
+            <div id="postStyleSuggestions"></div>
+          </div>
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('post')">Next</button>
+          </div>
+        </section>
+
+        <!-- 13) Advanced Settings -->
+        <section id="screen-settings" class="screen">
+          <h2>Advanced Settings</h2>
+          <p>Adjust additional settings for your character output. (Optional)</p>
+          
+          <label for="modelProvider">Model Provider:</label>
+          <select id="modelProvider" onchange="toggleOther('modelProvider')">
+            <option value="openai">OpenAI</option>
+            <option value="other">Other</option>
+          </select>
+          <div id="modelProviderOther" style="display:none;">
+            <input type="text" id="modelProviderInput" placeholder="Enter model provider">
+          </div>
+          
+          
+          <label for="voiceModel">Voice Model:</label>
+          <select id="voiceModel" onchange="toggleOther('voiceModel')">
+            <option value="" selected>Select Voice (Optional)</option>
+            <option value="en_US-male-medium">en_US-male-medium</option>
+            <option value="other">Other</option>
+          </select>
+          <div id="voiceModelOther" style="display:none;">
+            <input type="text" id="voiceModelInput" placeholder="Enter voice model">
+          </div>
+          <p class="helper-text">Select the default voice model for external applications. (This value will be stored in settings.)</p>
+          
+          <p>Plugins: This remains empty. To customize plugins, please refer to <a href="https://www.elizaos.com/plugins" target="_blank">ElizaOS Plugins</a>.</p>
+          
+          <div>
+            <button class="btn-back" onclick="prevStep()">Back</button>
+            <button class="btn-next" onclick="saveStep('settings')">Finish</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="preview">
+        <div class="preview-header">
+          <h2>Character Preview</h2>
+          <button class="save-to-cast-btn btn-icon" onclick="saveToCast()"><i class="fas fa-save"></i> Save to Cast</button>
+          <button id="downloadCharacterBtn" class="download-char-btn btn-icon"><i class="fas fa-download"></i> Download Character File</button>
+        </div>
+        <div id="previewIcon"></div>
+        <div id="previewContent"></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="castBar">
+    <div class="cast-header">
+      <div class="cast-header-left"> <!-- New grouping div -->
+        <span id="castTitleToggle" class="cast-title-clickable"><strong>CAST:</strong></span>
+        <button class="new-char-btn btn-icon" onclick="newCharacter()"><i class="fas fa-plus"></i> New Character</button>
+        <button class="import-btn btn-icon" onclick="document.getElementById('importFile').click()"><i class="fas fa-file-import"></i> Import Character</button>
+      </div>
+      <button class="toggle-btn btn-icon" onclick="toggleCastBar()">Show <i id="castToggleIcon" class="fas fa-chevron-up"></i></button>
+      <input type="file" id="importFile" style="display:none" onchange="importCharacter(this)">
+    </div>
+    <div id="castList"></div>
+    <div id="castPlaceholders"></div>
+  </div>
+  
+  <footer>
+    CharacterLab Created by <a href="https://www.twoguysonecat.com/">Two Guys One Cat</a> | MIT Licence
+  </footer>
+  <script src="gpt.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

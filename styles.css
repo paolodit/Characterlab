@@ -1,0 +1,668 @@
+
+/* Base Styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fafafa;
+  padding-bottom: 50px; /* Space for the fixed CastBar */
+}
+
+h2 {
+  color: #2c3e50;
+}
+
+header {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 10px;
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Vertically align items in the center */
+  justify-content: center; /* Horizontally center the content (logo + title block) */
+}
+
+#header-logo {
+  height: 40px; /* Adjust as needed */
+  margin-right: 10px; /* Space between logo and title */
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+footer {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 10px;
+  text-align: center;
+}
+
+header p.subheading {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* Small text for less important information */
+.small-text {
+  font-size: 0.8rem;
+  color: #777;
+  margin: 5px 0;
+  line-height: 1.2em;
+  max-width: 90%;
+}
+
+.container {
+  display: flex;
+  min-height: calc(100vh - 80px);
+}
+
+.sidebar {
+  width: 220px;
+  background: #e4f1ff;
+  padding: 20px;
+}
+
+/* Sidebar navigation item base style */
+.sidebar .step {
+  padding: 10px 15px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  color: #333; /* Default text color */
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Smooth transition */
+  display: flex; /* For icon alignment */
+  align-items: center; /* For icon alignment */
+}
+
+/* Sidebar navigation item hover state (for non-active items) */
+.sidebar .step:not(.active):hover {
+  background-color: #d4eaff; /* Light blue, slightly lighter than sidebar bg #e4f1ff */
+  color: #0056b3; /* Darker blue text on hover */
+  cursor: pointer;
+}
+
+/* Sidebar navigation item active state */
+.sidebar .step.active {
+  background-color: #007bff; /* Primary blue for active state */
+  color: white;
+  font-weight: bold;
+}
+
+/* Sidebar navigation item active state on hover (to prevent style change) */
+.sidebar .step.active:hover {
+  background-color: #007bff; /* Keep the same active background */
+  color: white; /* Keep the same active text color */
+  cursor: default; /* Indicate it's already active */
+}
+
+/* Main layout: editor (2/3) and preview (1/3) */
+.main {
+  flex: 1;
+  display: flex;
+  padding: 20px;
+}
+
+.editor {
+  width: 66.66%;
+  padding-right: 20px;
+}
+
+.preview {
+  width: 33.33%;
+  background: #fff;
+  border-left: 1px solid #ccc;
+  padding: 20px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+.preview h2 {
+  margin-bottom: 16px;
+}
+
+.preview p strong,
+.preview p:first-of-type strong {
+  color: #333;
+  font-weight: normal;
+}
+
+.preview p:first-of-type {
+  font-size: 1em;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.preview a,
+.editor a {
+  color: #4a90e2;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  border-bottom: 1px solid transparent;
+}
+
+.preview a:hover,
+.editor a:hover {
+  color: #2c6cb9;
+  border-bottom: 1px solid #2c6cb9;
+}
+
+.preview a:active,
+.editor a:active {
+  color: #1a4a80;
+}
+
+/* Steps */
+.step {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.step.active {
+  background-color: #d0e6f7;
+}
+
+/* Screen */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* Inputs */
+input[type="text"], textarea, select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+/* Buttons */
+button, .btn-sugg, .btn-respin, .btn-next, .btn-back, .btn-add, .download-btn {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+button:hover, .btn-sugg:hover, .btn-respin:hover, .btn-next:hover,
+.btn-back:hover, .btn-add:hover, .download-btn:hover {
+  filter: brightness(80%);
+}
+
+.btn-next { background-color: #28a745; color: white; padding: 8px 12px; }
+.btn-back { background-color: #006400; color: white; padding: 8px 12px; }
+.btn-add { background-color: #007bff; color: white; padding: 8px 12px; margin-bottom: 10px; }
+.btn-respin { background-color: #f39c12; color: white; padding: 6px 10px; margin-left: 10px; }
+.btn-sugg {
+  background-color: #FFFFE0;
+  color: #000;
+  margin: 5px 5px 5px 0;
+  padding: 6px 10px;
+  position: relative;
+  text-align: left;
+}
+
+/* Line Items */
+.line-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+.line-item {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  padding: 8px 12px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.line-item:hover {
+  background-color: #e9ecef;
+}
+
+.btn-delete-line {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 3px 6px; /* Adjusted for [x] */
+  font-size: 0.9em;
+  line-height: 1;
+  border-radius: 3px;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.btn-delete-line:hover {
+  color: #fff;
+  background-color: #c82333;
+}
+
+/* Sortable ghost */
+.sortable-ghost {
+  opacity: 0.5;
+  background-color: #cfe2ff;
+  border: 1px dashed #0d6efd;
+}
+
+/* Spacing for client checkbox group */
+.checkbox-group {
+  margin-bottom: 20px; /* Adjust as needed */
+}
+
+/* Spacing for suggestion blocks */
+.suggestions {
+  margin-bottom: 15px; /* Space below suggestion boxes/loading text */
+  min-height: 20px; /* Ensure it takes up some space even when empty before loading */
+}
+
+/* Glowing animation for loading text */
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  50% {
+    opacity: 0.7;
+    text-shadow: 0 0 15px rgba(0, 123, 255, 0.8);
+  }
+}
+
+.loading-suggestions {
+  display: inline-block; /* Allows text-shadow to be more visible if needed */
+  font-style: italic;
+  color: #007bff; /* Bootstrap primary blue, or choose another color */
+  animation: glow 1.5s infinite ease-in-out;
+}
+
+.loading-suggestions .fa-spinner {
+  margin-right: 8px;
+}
+
+/* Message Example Item Styling */
+.message-example-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.message-example-item .message-example-text {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.line-item-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-reorder {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #333;
+  padding: 2px 6px;
+  margin-left: 4px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.btn-reorder:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-reorder:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Click-to-edit styles */
+.line-text-display {
+  cursor: pointer;
+  flex-grow: 1; /* Allow text to take available space */
+  padding: 4px; /* Add some padding for easier clicking */
+}
+
+.line-text-display:hover {
+  background-color: #f0f0f0; /* Slight hover indication */
+}
+
+.edit-line-input {
+  flex-grow: 1;
+  margin-right: 5px;
+  padding: 3px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.btn-save-edit, .btn-cancel-edit {
+  padding: 3px 8px;
+  margin-left: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-save-edit {
+  background-color: #28a745; /* Green */
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.btn-cancel-edit {
+  background-color: #dc3545; /* Red */
+  color: white;
+  border: 1px solid #dc3545;
+}
+
+/* Message Example Edit Styles */
+.message-example-edit-fields label {
+  display: block;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.edit-user-input, .edit-assistant-input {
+  width: calc(100% - 10px); /* Full width minus padding */
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.message-example-edit-controls {
+  margin-top: 10px;
+  text-align: right;
+}
+
+/* Icon styling */
+.btn-icon i,
+.step i {
+  margin-right: 6px; /* Adds a small space between the icon and the text */
+}
+
+/* Info Carousel Styling */
+.info-carousel {
+  background-color: #fff8e9; /* Light yellow background */
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #ffe0b2; /* Complementary light orange/brown border */
+}
+
+.info-item {
+  display: none; /* Hidden by default */
+  margin-bottom: 10px; /* Space between item and navigation */
+}
+
+.info-item.active-info {
+  display: block; /* Show active item */
+}
+
+.info-item p {
+  margin: 0; /* Remove default paragraph margin within items */
+  line-height: 1.5;
+}
+
+.info-item i {
+  margin-right: 8px; /* Space between icon and text */
+  color: #0056b3; /* Icon color */
+  width: 20px; /* Ensure icons align nicely if text wraps */
+  text-align: center;
+}
+
+.info-navigation {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.info-nav-btn {
+  background-color: #95c7ff; /* Updated background color */
+  color: #000; /* Changed text to black for better contrast with lighter blue */
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 0 5px;
+  font-weight: bold;
+}
+
+.info-nav-btn:hover {
+  background-color: #7bb8ff; /* Darker shade for hover */
+}
+
+#infoProgress {
+  font-weight: bold;
+  color: #333;
+  margin: 0 10px;
+  display: inline-block; /* Ensures it aligns well with buttons */
+  min-width: 30px; /* Give it some space */
+  text-align: center;
+}
+
+/* Font size for info items is now harmonized via .info-item p */
+/* .info-item .small-text and .info-item .small-text i rules removed */
+
+/* Preview Pane Button Styling */
+.preview-header .save-to-cast-btn,
+.preview-header .download-char-btn {
+  padding: 12px 18px; /* Increased padding for these specific buttons */
+}
+
+/* Footer Styling */
+footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #f1f1f1; /* A light grey background for the footer */
+  font-size: 0.9rem;
+  color: #555;
+  border-top: 1px solid #ddd;
+}
+
+footer a {
+  color: #F9A825; /* Nice yellow for links */
+  text-decoration: none; /* Remove default underline */
+  transition: color 0.2s ease-in-out, text-decoration 0.2s ease-in-out;
+}
+
+footer a:hover {
+  color: #FFC107; /* Lighter/brighter yellow on hover */
+  text-decoration: underline; /* Add underline on hover */
+}
+
+/* Icon-only buttons in Cast Bar */
+.character-actions .btn-icon-only {
+  padding: 6px 8px; /* Adjust padding for a tighter fit around the icon */
+  margin-left: 5px; /* Space between buttons */
+  line-height: 1; /* Helps center icon vertically if it's slightly off */
+  background-color: #f0f0f0; /* Light grey background, similar to other buttons */
+  border: 1px solid #ccc; /* Standard border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer;
+}
+
+.character-actions .btn-icon-only:hover {
+  background-color: #e0e0e0; /* Slightly darker on hover */
+}
+
+.character-actions .btn-icon-only i {
+  margin-right: 0; /* Remove any right margin if inherited from .btn-icon */
+  color: #333; /* Default icon color */
+}
+
+/* Cast Bar Styling */
+#castBar {
+  background-color: #e9ecef; /* More present light grey background */
+  border-top: 1px solid #ced4da; /* Darker border to match */
+  padding: 10px;
+  position: fixed; /* Or 'sticky' if preferred, and supported by target browsers */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Ensure it's above other content if overlapping */
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.btn-sugg.active-suggestion {
+  background-color: #d0e0f0; /* A light blue background */
+  border-color: #007bff; /* A darker blue border */
+  color: #004085; /* Darker text color for contrast */
+  font-weight: bold;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.cast-header {
+  display: flex;
+  justify-content: space-between; /* Keeps left and right groups apart */
+  align-items: center;
+  /* margin-bottom is handled by .expanded/.not(.expanded) states */
+}
+
+.cast-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.cast-title-clickable {
+  cursor: pointer;
+  /* font-weight: bold; /* from <strong> */
+  margin-right: 15px; /* Space between "CAST:" and the first button */
+}
+
+/* Padding for all btn-icon within cast-header */
+.cast-header .btn-icon {
+  padding: 5px 8px; /* Small padding: 5px top/bottom, 8px left/right */
+  margin-left: 8px; /* Space between buttons */
+}
+
+/* Ensure the first button in the left group doesn't have an unnecessary left margin from the general rule above */
+.cast-header-left .btn-icon:first-of-type {
+  margin-left: 0;
+}
+
+/* The .toggle-btn is the direct child of .cast-header and is the last element, 
+   justify-content: space-between on .cast-header should handle its position correctly.
+   If specific margin is needed for it: 
+.cast-header > .toggle-btn.btn-icon {
+    margin-left: auto; /* Pushes it to the far right if not already handled by justify-content */
+/*}*/
+
+/* By default, cast list and placeholders are hidden */
+#castBar #castList,
+#castBar #castPlaceholders {
+  display: none;
+  max-height: 200px; /* Example max height */
+  overflow-y: auto; /* Scroll if content exceeds max height */
+  margin-top: 10px; /* Add some space above the list when it appears */
+}
+
+/* When castBar is expanded, show the list and placeholders */
+#castBar.expanded #castList,
+#castBar.expanded #castPlaceholders {
+  display: block;
+}
+
+/* Adjust margin of cast-header when expanded to give space to the list */
+#castBar.expanded .cast-header {
+  margin-bottom: 10px; 
+}
+
+#castBar:not(.expanded) .cast-header {
+  margin-bottom: 0; /* No bottom margin when contracted */
+}
+
+.character-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 5px;
+  border-bottom: 1px solid #eee;
+  background-color: transparent; /* Ensure it picks up parent bg for even rows */
+}
+.character-item:last-child {
+  border-bottom: none;
+}
+.character-left {
+  display: flex;
+  align-items: center;
+}
+.color-circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+}
+.character-name {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.character-name:hover {
+  text-decoration: underline;
+}
+.character-actions button {
+  margin-left: 5px;
+}
+
+/* Zebra striping for character items - now on ODD rows */
+.character-item:nth-child(odd) {
+  background-color: #f0f2f5; /* Subtle light grey for odd rows */
+}
+
+/* Hover effect for all character items */
+.character-item:hover {
+  background-color: #d1d5db; /* New hover color, distinct from both stripe colors */
+  cursor: default; /* Or 'pointer' if the whole row should be clickable, but individual elements like name are already pointers */
+}
+
+/* Status Messages for API Validation etc. */
+.message {
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  text-align: center;
+  display: block; /* Ensure it takes up width */
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Hide message paragraph if it's empty */
+.message:empty {
+  display: none;
+}
+
+.info-message {
+  color: #00529B; /* Dark blue text */
+  background-color: #BDE5F8; /* Light blue background */
+  border: 1px solid #70a9c9; /* Softer blue border */
+}
+
+.success-message {
+  color: #155724; /* Dark green text (Bootstrap success color) */
+  background-color: #d4edda; /* Light green background (Bootstrap success color) */
+  border: 1px solid #c3e6cb; /* Green border (Bootstrap success color) */
+}
+
+.error-message {
+  color: #721c24; /* Dark red text (Bootstrap danger color) */
+  background-color: #f8d7da; /* Light red background (Bootstrap danger color) */
+  border: 1px solid #f5c6cb; /* Red border (Bootstrap danger color) */
+}
