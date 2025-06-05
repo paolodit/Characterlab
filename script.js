@@ -1513,7 +1513,7 @@ async function saveStep(stepName) {
     if (statusDisplay) statusDisplay.textContent = 'Testing API connection...';
     if (statusDisplay) statusDisplay.className = 'message info-message';
 
-    const validationResult = await validateApiKey();
+    const validationResult = await validateApiKey(characterData.apiKey, characterData.apiProvider, characterData.aiModel);
 
     if (validationResult.valid) {
       if (statusDisplay) statusDisplay.textContent = 'API Key Valid!';
