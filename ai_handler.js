@@ -9,99 +9,113 @@ async function getChatSuggestions(prompt) {
     if (!characterData.aiModel) {
       throw new Error("No AI model selected.");
     }
-    
-    // Use the custom API provider URL if specified
-    const url = characterData.apiProvider || "https://api.openai.com/v1/chat/completions";
-    
+
+    const targetApiUrl = characterData.apiProvider || "https://api.openai.com/v1/chat/completions";
+    const proxyUrl = "proxy.php";
+
     const messages = [
       { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ];
-    
-    // Prepare the request body based on the API provider
-    let requestBody = {
+
+    const originalPayload = {
       model: characterData.aiModel,
       messages: messages,
       max_tokens: 500,
       temperature: 0.9,
       n: 1
     };
-    
-    const response = await fetch(url, {
+
+    const proxyRequestBody = {
+      targetApiUrl: targetApiUrl,
+      payload: originalPayload
+    };
+
+    const response = await fetch(proxyUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + characterData.apiKey
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(proxyRequestBody)
     });
-    
+
     if (!response.ok) {
-      const err = await response.json();
-      console.error("API error:", err);
-      throw new Error(err.error?.message || "Failed to fetch suggestions.");
+      const errText = await response.text(); // Get raw text for better error diagnosis from proxy
+      console.error("Proxy/API error text:", errText);
+      try {
+        const errJson = JSON.parse(errText);
+        throw new Error(errJson.error?.message || errJson.error || "Failed to fetch suggestions via proxy.");
+      } catch (e) {
+        throw new Error(`Failed to fetch suggestions. Status: ${response.status}. Response: ${errText}`);
+      }
     }
-    
+
     const data = await response.json();
+    if (data.error) { // Handle errors returned by the proxy itself or the target API via proxy
+        console.error("Error from proxy/API:", data.error);
+        throw new Error(data.error.message || data.error);
+    }
     const content = data.choices[0].message.content.trim();
     const lines = content.split("\n").map(l => l.trim().replace(/^-\s*/, "")).filter(Boolean);
     return lines;
   }
   
   // Function to validate API key by making a test request
-async function validateApiKey() {
+async function validateApiKey(apiKey, apiProvider, model) {
+  if (!apiKey) {
+    console.warn("API Key is empty for validation.");
+    return { valid: false, error: "API Key is empty." };
+  }
+  if (!model) {
+    console.warn("No model selected for validation.");
+    return { valid: false, error: "No AI model selected for validation." };
+  }
+
+  const targetApiUrl = apiProvider || "https://api.openai.com/v1/chat/completions";
+  const proxyUrl = "proxy.php";
+
+  const originalPayload = {
+    model: model, // Use the 'model' parameter
+    messages: [{ role: "user", content: "Test" }],
+    max_tokens: 5
+  };
+
+  const proxyRequestBody = {
+    targetApiUrl: targetApiUrl,
+    payload: originalPayload
+  };
+
   try {
-    if (!characterData.apiKey) {
-      return { valid: false, message: "Please enter an API key." };
-    }
-    if (!characterData.aiModel) {
-      return { valid: false, message: "Please select an AI model." };
-    }
-    
-    // Use the custom API provider URL if specified
-    const url = characterData.apiProvider || "https://api.openai.com/v1/chat/completions";
-    
-    // Create a minimal request to validate the API key
-    const messages = [
-      { role: "system", content: "You are a helpful assistant." },
-      { role: "user", content: "Test" }
-    ];
-    
-    // Prepare the request body based on the API provider
-    let requestBody = {
-      model: characterData.aiModel,
-      messages: messages,
-      max_tokens: 5,  // Minimal tokens to reduce cost
-      temperature: 0.7,
-      n: 1
-    };
-    
-    const response = await fetch(url, {
+    const response = await fetch(proxyUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + characterData.apiKey
+        "Authorization": "Bearer " + apiKey, // Use the 'apiKey' parameter
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(proxyRequestBody),
     });
-    
-    if (!response.ok) {
-      const err = await response.json();
-      console.error("API validation error:", err);
-      return { 
-        valid: false, 
-        message: err.error?.message || "Invalid API key or configuration. Please check your settings."
-      };
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.error) { // Check for errors returned by proxy/API even on 200 OK
+        console.error("API Key validation failed (proxy/API error):", data.error.message || data.error);
+        return { valid: false, error: data.error.message || data.error };
+      }
+      return { valid: true };
+    } else {
+      const errorText = await response.text();
+      console.error("API Key validation failed (HTTP error text):", errorText);
+      try {
+        const errorJson = JSON.parse(errorText);
+        return { valid: false, error: errorJson.error?.message || errorJson.error || `Validation failed with status: ${response.status}` };
+      } catch (e) {
+        return { valid: false, error: `Validation failed. Status: ${response.status}. Response: ${errorText}` };
+      }
     }
-    
-    // If we got here, the API key is valid
-    return { valid: true };
   } catch (error) {
-    console.error("API validation error:", error);
-    return { 
-      valid: false, 
-      message: error.message || "Failed to validate API key. Please check your connection and try again."
-    };
+    console.error("Network error during API Key validation via proxy:", error.message);
+    return { valid: false, error: "Network error or API unreachable during validation via proxy." };
   }
 }
   
